@@ -1,4 +1,3 @@
-import joblib
 import torch
 import torch.nn as nn 
 import numpy as np
@@ -33,8 +32,10 @@ num_layers = 2
 # Load the saved model and scalers
 model = TransformerModel(input_dim, d_model, nhead, num_layers)  # Define the model first
 model.load_state_dict(torch.load("aqi_transformer_model.pkl"))  # Load the trained weights
-scaler_features = joblib.load("scaler_features.pkl")
-scaler_target = joblib.load("scaler_target.pkl")
+
+# Initialize the MinMaxScaler
+scaler_features = MinMaxScaler()
+scaler_target = MinMaxScaler()
 
 # Ensure the model is in evaluation mode
 model.eval()
@@ -115,8 +116,8 @@ def predict():
     # Preprocess the data
     preprocessed_data = preprocess_data(data)
 
-    # Scale the features
-    scaled_features = scaler_features.transform(preprocessed_data)
+    # Scale the features using the MinMaxScaler directly
+    scaled_features = scaler_features.fit_transform(preprocessed_data)
 
     # Convert to torch tensor for prediction
     scaled_features_tensor = torch.tensor(scaled_features, dtype=torch.float32).unsqueeze(0)
